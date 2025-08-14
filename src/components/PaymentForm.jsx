@@ -35,7 +35,6 @@ export default function PaymentForm({onAdd}) {
 
         convertToGel(form.amount, form.currency, form.date)
             .then((result) => {
-                console.log(result);
                 onAdd({
                     amount: Number(form.amount),
                     currency: form.currency.toUpperCase(),

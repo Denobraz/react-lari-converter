@@ -35,11 +35,6 @@ function buildUrl(code, date) {
  */
 function extractRate(data) {
   if (!data) return null;
-
-  console.log(data);
-  console.log(data[0]?.currencies);
-  console.log(data[0]?.currencies[0]?.rate);
-
   return data[0]?.currencies[0]?.rate || null;
 }
 

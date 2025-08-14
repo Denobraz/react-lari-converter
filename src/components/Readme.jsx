@@ -2,8 +2,8 @@ export function Readme() {
     const URL = 'https://nbg.gov.ge/en/monetary-policy/currency';
 
     return <div className='bg-neutral-900 text-neutral-200 p-4 rounded-lg flex'>
-        <div className='hidden md:block w-4 mr-4 pt-1 shrink-0'>
-            <img src="./public/info.svg" alt="Info"/>
+        <div className='hidden md:block w-4 mr-4 shrink-0'>
+            ℹ️
         </div>
         <div>
             <p>Форма для подсчета входящих платежей в лари для отчетности перед грузинской налоговой</p>

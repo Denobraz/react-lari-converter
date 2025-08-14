@@ -1,10 +1,24 @@
 import {CURRENCIES} from '../data/currencies.data.js';
-import {useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 
 export default function PaymentsTable({payments, onDelete}) {
 
+    const [totalInGelCopied, setTotalInGelCopied] = useState(false);
+
+    useEffect(() => {
+
+        if (totalInGelCopied) {
+            const timer = setTimeout(() => setTotalInGelCopied(false), 1000);
+            return () => clearTimeout(timer);
+        }
+
+    }, [totalInGelCopied])
+
     const formatAmount = (amount) => {
-        return Number(amount).toFixed(2);
+        return new Intl.NumberFormat('ru-RU', {
+            style: 'decimal',
+            maximumFractionDigits: 2
+        }).format(amount).replace(',', '.');
     }
 
     const formatCurrency = (code) => {
@@ -24,6 +38,11 @@ export default function PaymentsTable({payments, onDelete}) {
     const totalInGel = useMemo(() => {
         return payments.reduce((sum, p) => sum + p.amountInGel, 0).toFixed(2);
     }, [payments]);
+
+    const copyTotalInGel = () => {
+        navigator.clipboard.writeText(totalInGel)
+            .then(() => setTotalInGelCopied(true));
+    }
 
     return (
         <section className='space-y-3'>
@@ -65,7 +84,8 @@ export default function PaymentsTable({payments, onDelete}) {
             </div>
             <div className='mt-3'>
                 <div className='font-medium'>
-                    Итого в лари: <span className='text-blue-400'>{formatAmount(totalInGel)}</span>
+                    Итого в лари: <span title='Скопировать' onClick={copyTotalInGel} className='text-blue-400 hover:underline cursor-pointer'>{formatAmount(totalInGel)}</span>
+                    {totalInGelCopied && <span className='text-blue-400 text-sm ml-2'>(скопировано)</span>}
                 </div>
             </div>
         </section>

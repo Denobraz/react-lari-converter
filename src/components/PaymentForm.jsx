@@ -16,7 +16,7 @@ export default function PaymentForm({onAdd}) {
 
     const [error, setError] = useState(null);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setIsLoading(true);
@@ -33,21 +33,21 @@ export default function PaymentForm({onAdd}) {
             return;
         }
 
-        convertToGel(form.amount, form.currency, form.date)
-            .then((result) => {
-                onAdd({
-                    amount: Number(form.amount),
-                    currency: form.currency.toUpperCase(),
-                    date: form.date,
-                    amountInGel: result,
-                });
-                setIsLoading(false);
-                setForm(f => ({...f, amount: '', date: TODAY}));
-            })
-            .catch(err => {
-                console.error(err);
-                setError('Не удалось получить курс валюты. Попробуйте позже.');
+        try {
+            const result = await convertToGel(form.amount, form.currency, form.date);
+            onAdd({
+                amount: Number(form.amount),
+                currency: form.currency.toUpperCase(),
+                date: form.date,
+                amountInGel: result,
             });
+            setForm(f => ({...f, amount: '', date: TODAY}));
+        } catch (err) {
+            console.error(err);
+            setError('Не удалось получить курс валюты. Попробуйте позже.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

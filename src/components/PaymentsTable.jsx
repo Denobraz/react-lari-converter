@@ -48,26 +48,26 @@ export default function PaymentsTable({payments, onDelete}) {
         <section className='space-y-3'>
             <h2 className='font-medium'>Список платежей ({payments.length})</h2>
             <div className='overflow-x-auto rounded-lg'>
-                <table className='w-full text-left border-collapse'>
+                <table className='table-auto lg:table-fixed w-full text-left border-collapse'>
                     <thead>
                     <tr className='bg-neutral-800'>
-                        <th className='px-3 py-2 font-medium'>#</th>
-                        <th className='px-3 py-2 font-medium'>Сумма</th>
-                        <th className='px-3 py-2 font-medium'>Валюта</th>
-                        <th className='px-3 py-2 font-medium'>Дата</th>
-                        <th className='px-3 py-2 font-medium'>Сумма в лари</th>
-                        <th className='px-3 py-2 font-medium'></th>
+                        <th className='px-3 py-2 font-medium whitespace-nowrap'>#</th>
+                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Сумма</th>
+                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Валюта</th>
+                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Дата</th>
+                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Сумма в лари</th>
+                        <th className='px-3 py-2 font-medium whitespace-nowrap'></th>
                     </tr>
                     </thead>
                     <tbody>
                     {payments.map((p, i) => (
                         <tr key={i} className='odd:bg-neutral-900 even:bg-neutral-800'>
-                            <td className='px-3 py-1'>{i + 1}</td>
-                            <td className='px-3 py-1'>{formatAmount(p.amount)}</td>
-                            <td className='px-3 py-1'>{formatCurrency(p.currency)}</td>
-                            <td className='px-3 py-1'>{formatDate(p.date)}</td>
-                            <td className='px-3 py-1'>{formatAmount(p.amountInGel)}</td>
-                            <td className='px-3 py-1'>
+                            <td className='px-3 py-1 whitespace-nowrap'>{i + 1}</td>
+                            <td className='px-3 py-1 whitespace-nowrap'>{formatAmount(p.amount)}</td>
+                            <td className='px-3 py-1 whitespace-nowrap'>{formatCurrency(p.currency)}</td>
+                            <td className='px-3 py-1 whitespace-nowrap'>{formatDate(p.date)}</td>
+                            <td className='px-3 py-1 whitespace-nowrap'>{formatAmount(p.amountInGel)}</td>
+                            <td className='px-3 py-1 whitespace-nowrap'>
                                 <button onClick={() => onDelete(i)}
                                         className='text-red-400 hover:text-red-300 cursor-pointer'>Удалить
                                 </button>
@@ -84,7 +84,7 @@ export default function PaymentsTable({payments, onDelete}) {
             </div>
             <div className='mt-3'>
                 <div className='font-medium'>
-                    Итого в лари: <span title='Скопировать' onClick={copyTotalInGel} className='text-blue-400 hover:underline cursor-pointer'>{formatAmount(totalInGel)}</span>
+                    💸 Итого в лари: <span title='Скопировать' onClick={copyTotalInGel} className='text-blue-400 hover:underline cursor-pointer'>{formatAmount(totalInGel)}</span>
                     {totalInGelCopied && <span className='text-blue-400 text-sm ml-2'>(скопировано)</span>}
                 </div>
             </div>

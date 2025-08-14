@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {CURRENCIES} from "../data/currencies.data.js";
 import {convertToGel} from "../helpers/nbgRates.js";
 
@@ -16,30 +16,47 @@ export default function PaymentForm({onAdd}) {
 
     const [error, setError] = useState(null);
 
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error])
+
+    const validateForm = () => {
+        if (!form.amount || !form.currency || !form.date) {
+            throw new Error('Пожалуйста, заполните все поля.');
+        }
+
+        if (form.amount <= 0) {
+            throw new Error('Сумма должна быть больше нуля.');
+        }
+
+        if (form.date > TODAY) {
+            throw new Error('Дата не может быть в будущем.');
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setIsLoading(true);
 
-        if (!form.amount || !form.currency || !form.date) {
-            setError('Пожалуйста, заполните все поля.');
+        try {
+            validateForm();
+        } catch (e) {
             setIsLoading(false);
-            return;
-        }
-
-        if (form.date > TODAY) {
-            setError('Дата не может быть в будущем.');
-            setIsLoading(false);
+            setError(e.message);
             return;
         }
 
         try {
-            const result = await convertToGel(form.amount, form.currency, form.date);
+            const amountInGel = await convertToGel(form.amount, form.currency, form.date);
             onAdd({
                 amount: Number(form.amount),
                 currency: form.currency.toUpperCase(),
                 date: form.date,
-                amountInGel: result,
+                amountInGel,
             });
             setForm(f => ({...f, amount: '', date: TODAY}));
         } catch (err) {
@@ -71,7 +88,7 @@ export default function PaymentForm({onAdd}) {
                     {isLoading ? 'Загрузка...' : 'Добавить'}
                 </button>
             </form>
-            {error && <div className='text-red-400 text-xs'>{error}</div>}
+            {error && <div className='text-red-400 text-xs transition-all'>{error}</div>}
         </section>
     );
 }

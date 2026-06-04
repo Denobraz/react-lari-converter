@@ -35,36 +35,31 @@ export default function PaymentsTable({payments, reportYear, reportMonth, onDele
         }
     };
 
-    const countLabel = filteredPayments.length === 1 ? 'запись'
-        : filteredPayments.length < 5 ? 'записи' : 'записей';
-
     return (
-        <section className='card space-y-4 min-w-0' aria-labelledby='payments-heading'>
-            <div>
-                <h2 id='payments-heading' className='section-title'>📋 Платежи</h2>
-                <p className='section-desc mt-1'>
+        <section className='card min-w-0' aria-labelledby='payments-heading'>
+            <div className='mb-3'>
+                <h2 id='payments-heading' className='section-title'>Платежи</h2>
+                <p className='section-meta'>
                     {reportMonthLabel} {reportYear}
-                    {filteredPayments.length > 0 && (
-                        <> · {filteredPayments.length} {countLabel}</>
-                    )}
+                    {filteredPayments.length > 0 && ` · ${filteredPayments.length}`}
                 </p>
             </div>
 
             {filteredPayments.length === 0 ? (
-                <p className='py-10 text-center text-[15px]' style={{ color: 'var(--label)' }}>
-                    📭 Нет платежей за выбранный период
+                <p className='py-6 text-center text-[13px] text-muted'>
+                    Нет платежей
                 </p>
             ) : (
-                <div className='overflow-x-auto -mx-5 px-5'>
-                    <table className='w-full min-w-[480px] text-left border-collapse'>
+                <div className='overflow-x-auto -mx-4 px-4'>
+                    <table className='w-full min-w-[440px] text-left border-collapse'>
                         <thead>
                         <tr className='separator border-b'>
-                            <th scope='col' className='table-head w-8'>№</th>
+                            <th scope='col' className='table-head w-7'>#</th>
                             <th scope='col' className='table-head'>Сумма</th>
-                            <th scope='col' className='table-head'>Валюта</th>
+                            <th scope='col' className='table-head'>Вал.</th>
                             <th scope='col' className='table-head'>Дата</th>
-                            <th scope='col' className='table-head text-right'>₾</th>
-                            <th scope='col' className='table-head w-16'>
+                            <th scope='col' className='table-head-accent text-right'>Сумма в лари</th>
+                            <th scope='col' className='table-head w-14'>
                                 <span className='sr-only'>Действия</span>
                             </th>
                         </tr>
@@ -72,23 +67,22 @@ export default function PaymentsTable({payments, reportYear, reportMonth, onDele
                         <tbody>
                         {filteredPayments.map((p, i) => (
                             <tr key={p.id} className='separator border-b last:border-0'>
-                                <td className='table-cell text-[13px]' style={{ color: 'var(--label)' }}>{i + 1}</td>
-                                <td className='table-cell font-medium'>{formatAmount(p.amount)}</td>
-                                <td className='table-cell'>
-                                    {CURRENCY_EMOJI[p.currency]}{' '}
-                                    <span style={{ color: 'var(--label)' }}>{p.currency}</span>
+                                <td className='table-cell text-[13px] text-muted'>{i + 1}</td>
+                                <td className='table-cell'>{formatAmount(p.amount)}</td>
+                                <td className='table-cell text-muted'>
+                                    {CURRENCY_EMOJI[p.currency]} {p.currency}
                                     <span className='sr-only'>{formatCurrency(p.currency)}</span>
                                 </td>
-                                <td className='table-cell' style={{ color: 'var(--label)' }}>{formatDate(p.date)}</td>
-                                <td className='table-cell font-semibold text-right'>{formatAmount(p.amountInGel)}</td>
+                                <td className='table-cell text-muted'>{formatDate(p.date)}</td>
+                                <td className='table-cell font-medium text-right'>{formatAmount(p.amountInGel)}</td>
                                 <td className='table-cell text-right'>
                                     <button
                                         type='button'
                                         onClick={() => handleDelete(p)}
                                         className='btn-destructive'
-                                        aria-label={`Удалить платёж ${formatAmount(p.amount)} ${p.currency}`}
+                                        aria-label={`Удалить ${formatAmount(p.amount)} ${p.currency}`}
                                     >
-                                        🗑️
+                                        Удалить
                                     </button>
                                 </td>
                             </tr>

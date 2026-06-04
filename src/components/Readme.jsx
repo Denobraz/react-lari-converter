@@ -2,24 +2,31 @@ export function Readme() {
     const URL = 'https://nbg.gov.ge/en/monetary-policy/currency';
 
     return (
-        <details className='group'>
-            <summary className='cursor-pointer select-none list-none flex items-center justify-between gap-2 text-[15px] transition-opacity hover:opacity-70 [&::-webkit-details-marker]:hidden' style={{ color: 'var(--label)' }}>
-                <span>ℹ️ О приложении</span>
-                <span className='text-[13px] transition-transform group-open:rotate-180' aria-hidden='true'>⌄</span>
-            </summary>
-            <div className='mt-3 space-y-2 text-[15px] leading-relaxed max-w-prose' style={{ color: 'var(--label)' }}>
+        <section className='pt-1' aria-label='О приложении'>
+            <h2 className='section-title mb-2'>О приложении</h2>
+            <div className='space-y-1.5 text-[13px] leading-relaxed text-muted max-w-prose'>
                 <p>
-                    Подсчёт входящих платежей в лари для отчётности перед грузинской налоговой.
-                    Конвертация по официальному курсу НБГ на дату платежа.
+                    Конвертация входящих платежей в лари по курсу НБГ для налоговой отчётности.
                 </p>
                 <p>
-                    Курсы —{' '}
+                    Курсы:{' '}
                     <a target='_blank' rel='noopener noreferrer' href={URL} className='link'>
                         nbg.gov.ge
-                    </a>.
-                    Данные хранятся локально в браузере.
+                    </a>
+                    . Данные — локально в браузере.
+                </p>
+                <p>
+                    Сделано с ❤️{' '}
+                    <a
+                        className='link text-[13px]'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        href='https://github.com/Denobraz'
+                    >
+                        Denobraz
+                    </a>
                 </p>
             </div>
-        </details>
+        </section>
     );
 }

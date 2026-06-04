@@ -13,10 +13,10 @@ function CopyButton({value, label, copied, onCopy}) {
         <button
             type='button'
             onClick={() => onCopy(value)}
-            className='btn-text mt-2 text-[15px]'
-            aria-label={copied ? `${label}: скопировано` : `${label}: скопировать ${value}`}
+            className='btn-text mt-1'
+            aria-label={copied ? `${label}: скопировано` : `${label}: скопировать`}
         >
-            {copied ? '✅ Скопировано' : '📋 Копировать'}
+            {copied ? 'Скопировано' : 'Копировать'}
         </button>
     );
 }
@@ -75,26 +75,18 @@ export default function ReportSidebar({
         navigator.clipboard.writeText(text).then(() => setCopied(true)).catch(() => {});
     };
 
-    const countLabel = filteredCount === 1 ? 'платёж'
-        : filteredCount < 5 ? 'платежа' : 'платежей';
-
     return (
         <aside
-            className='lg:w-72 shrink-0 card lg:sticky lg:top-6 lg:self-start space-y-5'
+            className='lg:w-64 shrink-0 card lg:sticky lg:top-5 lg:self-start'
             aria-label='Отчётный период и итоги'
         >
-            <div>
-                <h2 className='section-title'>📊 Период</h2>
-                <p className='section-desc mt-1'>
-                    {reportMonthLabel} {reportYear} · {filteredCount} {countLabel}
-                </p>
-            </div>
+            <h2 className='section-title mb-3'>Период</h2>
 
-            <div className='grid grid-cols-2 gap-3'>
-                <label className='flex flex-col gap-1.5'>
+            <div className='grid grid-cols-2 gap-2 mb-4'>
+                <label className='flex flex-col gap-1'>
                     <span className='field-label'>Год</span>
                     <select
-                        className='input-field text-[15px]'
+                        className='input-field'
                         value={reportYear}
                         onChange={e => onReportYearChange(e.target.value)}
                     >
@@ -103,10 +95,10 @@ export default function ReportSidebar({
                         ))}
                     </select>
                 </label>
-                <label className='flex flex-col gap-1.5'>
+                <label className='flex flex-col gap-1'>
                     <span className='field-label'>Месяц</span>
                     <select
-                        className='input-field text-[15px]'
+                        className='input-field'
                         value={reportMonth}
                         onChange={e => onReportMonthChange(e.target.value)}
                     >
@@ -117,12 +109,15 @@ export default function ReportSidebar({
                 </label>
             </div>
 
-            <div className='space-y-3 separator border-t pt-4'>
-                <div className='stat-block'>
-                    <p className='stat-label'>💰 Итого за месяц</p>
+            <p className='section-meta mb-3'>
+                {reportMonthLabel} {reportYear} · {filteredCount} шт.
+            </p>
+
+            <div className='separator border-t'>
+                <div className='stat-row'>
+                    <p className='stat-label'>За месяц</p>
                     <p className='stat-value'>
-                        {formatAmount(monthTotalInGel)}
-                        <span className='text-[17px] font-normal ml-1' style={{ color: 'var(--label)' }}>₾</span>
+                        {formatAmount(monthTotalInGel)} ₾
                     </p>
                     <CopyButton
                         value={monthTotalInGel}
@@ -132,13 +127,12 @@ export default function ReportSidebar({
                     />
                 </div>
 
-                <div className='stat-block'>
+                <div className='stat-row'>
                     <p className='stat-label'>
-                        📈 Нарастающий итог · янв — {reportMonthLabel.toLowerCase()}
+                        Нарастающий · янв—{reportMonthLabel.toLowerCase().slice(0, 3)}
                     </p>
                     <p className='stat-value'>
-                        {formatAmount(cumulativeTotalInGel)}
-                        <span className='text-[17px] font-normal ml-1' style={{ color: 'var(--label)' }}>₾</span>
+                        {formatAmount(cumulativeTotalInGel)} ₾
                     </p>
                     <CopyButton
                         value={cumulativeTotalInGel}
@@ -149,28 +143,23 @@ export default function ReportSidebar({
                 </div>
             </div>
 
-            <label className='flex flex-col gap-1.5 separator border-t pt-4'>
-                <span className='field-label'>
-                    ✏️ Корректировка · {reportYear}
-                </span>
-                <span className='field-hint'>
-                    Лари за месяцы до начала учёта
-                </span>
+            <label className='flex flex-col gap-1 separator border-t pt-3 mt-1'>
+                <span className='field-label'>Корректировка {reportYear}</span>
                 <input
                     type='number'
                     inputMode='decimal'
                     step='0.01'
                     min='0'
                     placeholder='0.00'
-                    className='input-field text-[15px]'
+                    className='input-field'
                     value={adjustmentInputValue}
                     onChange={e => onYearAdjustmentChange(e.target.value)}
                 />
             </label>
 
             {(Number(yearAdjustment) || 0) > 0 && (
-                <p className='field-hint'>
-                    {formatAmount(yearAdjustment)} корр. + {formatAmount(yearPaymentsTotal)} платежи
+                <p className='field-hint mt-2'>
+                    {formatAmount(yearAdjustment)} + {formatAmount(yearPaymentsTotal)}
                 </p>
             )}
         </aside>

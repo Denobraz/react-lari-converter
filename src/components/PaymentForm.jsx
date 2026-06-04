@@ -36,7 +36,7 @@ export default function PaymentForm({onAdd}) {
 
     const validateForm = () => {
         if (!form.amount || !form.currency || !form.date) {
-            throw new Error('Заполните все поля формы.');
+            throw new Error('Заполните все поля.');
         }
 
         if (Number(form.amount) <= 0) {
@@ -71,10 +71,10 @@ export default function PaymentForm({onAdd}) {
                 amountInGel,
             });
             setForm(f => ({...f, amount: '', date: TODAY}));
-            setSuccess('Платёж добавлен.');
+            setSuccess('Платёж добавлен');
         } catch (err) {
             console.error(err);
-            setError('Не удалось получить курс валюты. Проверьте дату и попробуйте снова.');
+            setError('Не удалось получить курс. Проверьте дату.');
         } finally {
             setIsLoading(false);
         }
@@ -83,17 +83,12 @@ export default function PaymentForm({onAdd}) {
     const isSubmitDisabled = isLoading || !form.amount.trim();
 
     return (
-        <section className='card space-y-4' aria-labelledby={`${formId}-heading`}>
-            <div>
-                <h2 id={`${formId}-heading`} className='section-title'>➕ Новый платёж</h2>
-                <p className='section-desc mt-1'>
-                    Конвертация по курсу НБГ на дату поступления
-                </p>
-            </div>
+        <section className='card' aria-labelledby={`${formId}-heading`}>
+            <h2 id={`${formId}-heading`} className='section-title mb-3'>Новый платёж</h2>
 
-            <form onSubmit={handleSubmit} className='space-y-4' noValidate>
+            <form onSubmit={handleSubmit} className='space-y-3' noValidate>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
-                    <label className='flex flex-col gap-1.5'>
+                    <label className='flex flex-col gap-1'>
                         <span className='field-label'>Сумма</span>
                         <input
                             type='number'
@@ -111,7 +106,7 @@ export default function PaymentForm({onAdd}) {
                         />
                     </label>
 
-                    <label className='flex flex-col gap-1.5'>
+                    <label className='flex flex-col gap-1'>
                         <span className='field-label'>Валюта</span>
                         <select
                             className='input-field'
@@ -121,13 +116,13 @@ export default function PaymentForm({onAdd}) {
                         >
                             {CURRENCIES.map(c => (
                                 <option key={c.code} value={c.code}>
-                                    {c.emoji} {c.name}
+                                    {c.emoji} {c.code}
                                 </option>
                             ))}
                         </select>
                     </label>
 
-                    <label className='flex flex-col gap-1.5'>
+                    <label className='flex flex-col gap-1'>
                         <span className='field-label'>Дата</span>
                         <input
                             type='date'
@@ -139,17 +134,17 @@ export default function PaymentForm({onAdd}) {
                         />
                     </label>
 
-                    <div className='flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1'>
+                    <div className='flex flex-col gap-1 sm:col-span-2 lg:col-span-1'>
                         <span className='field-label invisible hidden sm:block' aria-hidden='true'>&nbsp;</span>
                         <button
-                            className='btn-primary w-full h-[44px]'
+                            className='btn-primary w-full h-[38px]'
                             type='submit'
                             disabled={isSubmitDisabled}
                         >
                             {isLoading ? (
                                 <>
                                     <span className='spinner' aria-hidden='true' />
-                                    Загрузка…
+                                    Загрузка
                                 </>
                             ) : (
                                 'Добавить'
@@ -158,17 +153,9 @@ export default function PaymentForm({onAdd}) {
                     </div>
                 </div>
 
-                <div aria-live='polite' className='min-h-[1.5rem]'>
-                    {error && (
-                        <div id={errorId} role='alert' className='alert-error'>
-                            ⚠️ {error}
-                        </div>
-                    )}
-                    {success && !error && (
-                        <div id={successId} role='status' className='alert-success'>
-                            ✅ {success}
-                        </div>
-                    )}
+                <div aria-live='polite' className='min-h-[1.25rem]'>
+                    {error && <div id={errorId} role='alert' className='alert-error'>{error}</div>}
+                    {success && !error && <div id={successId} role='status' className='alert-success'>{success}</div>}
                 </div>
             </form>
         </section>

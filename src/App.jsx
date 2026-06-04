@@ -44,14 +44,27 @@ function App() {
     const yearAdjustment = report.yearAdjustments[report.year] ?? 0;
 
     return (
-        <div className='min-h-screen w-full flex flex-col bg-black text-white px-6 py-5'>
-            <div className='flex-1 flex flex-col justify-center w-full'>
-                <div className='w-full max-w-5xl mx-auto flex flex-col gap-6'>
-                    <div className='flex flex-col lg:flex-row gap-6 items-start justify-center'>
+        <div className='min-h-screen w-full flex flex-col px-4 py-6 sm:px-6'>
+            <a
+                href='#main-content'
+                className='sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-[10px] focus:px-4 focus:py-2 focus:text-[15px] focus:text-white'
+                style={{ backgroundColor: 'var(--apple-blue)' }}
+            >
+                Перейти к содержимому
+            </a>
 
-                    <main className='flex-1 min-w-0 w-full space-y-6'>
-                        <h1 className='text-xl lg:text-2xl font-semibold'>🇬🇪 Входящие платежи в лари</h1>
+            <div className='flex-1 w-full max-w-5xl mx-auto'>
+                <header className='mb-8'>
+                    <h1 className='page-title'>
+                        🇬🇪 Входящие платежи в лари
+                    </h1>
+                    <p className='page-subtitle'>
+                        Конвертация по курсу НБГ и расчёт итогов для налоговой отчётности
+                    </p>
+                </header>
 
+                <div className='flex flex-col lg:flex-row gap-5 items-start'>
+                    <main id='main-content' className='flex-1 min-w-0 w-full space-y-5'>
                         <PaymentForm onAdd={addPayment} />
                         <PaymentsTable
                             payments={payments}
@@ -71,12 +84,12 @@ function App() {
                         onReportMonthChange={setReportMonth}
                         onYearAdjustmentChange={setYearAdjustment}
                     />
-                    </div>
                 </div>
             </div>
+
             <Footer/>
         </div>
-    )
+    );
 }
 
-export default App
+export default App;

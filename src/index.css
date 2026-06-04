@@ -1,29 +1,188 @@
 @import "tailwindcss";
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@layer base {
+  :root {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.47059;
+    font-weight: 400;
+    color-scheme: dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+    --apple-blue: #0a84ff;
+    --apple-green: #30d158;
+    --apple-red: #ff453a;
+    --apple-orange: #ff9f0a;
+    --bg: #000000;
+    --grouped: #1c1c1e;
+    --grouped-secondary: #2c2c2e;
+    --separator: rgba(84, 84, 88, 0.65);
+    --label: rgba(235, 235, 245, 0.6);
+    --label-secondary: rgba(235, 235, 245, 0.3);
+  }
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  body {
+    @apply min-h-screen text-white;
+    background-color: var(--bg);
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--apple-blue);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgba(10, 132, 255, 0.35);
+  }
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer components {
+  .card {
+    @apply rounded-xl p-5;
+    background-color: var(--grouped);
   }
-  a:hover {
-    color: #747bff;
+
+  .input-field {
+    @apply w-full rounded-[10px] px-3 py-2.5 text-[17px] text-white transition-colors;
+    background-color: var(--grouped-secondary);
+    border: none;
   }
-  button {
-    background-color: #f9f9f9;
+
+  .input-field::placeholder {
+    color: var(--label-secondary);
+  }
+
+  .input-field:focus-visible {
+    @apply ring-2 ring-[rgba(10,132,255,0.5)];
+  }
+
+  .input-field:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5
+           text-[17px] font-medium text-white transition-opacity;
+    background-color: var(--apple-blue);
+  }
+
+  .btn-primary:hover {
+    opacity: 0.85;
+  }
+
+  .btn-primary:active {
+    opacity: 0.7;
+  }
+
+  .btn-primary:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+
+  .btn-text {
+    @apply text-[15px] font-normal transition-opacity;
+    color: var(--apple-blue);
+  }
+
+  .btn-text:hover {
+    opacity: 0.7;
+  }
+
+  .btn-destructive {
+    @apply text-[15px] transition-opacity;
+    color: var(--apple-red);
+  }
+
+  .btn-destructive:hover {
+    opacity: 0.7;
+  }
+
+  .section-title {
+    @apply text-[22px] font-semibold tracking-tight text-white;
+  }
+
+  .section-desc {
+    @apply text-[15px] leading-snug;
+    color: var(--label);
+  }
+
+  .field-label {
+    @apply text-[13px] font-normal;
+    color: var(--label);
+  }
+
+  .field-hint {
+    @apply text-[13px] leading-snug;
+    color: var(--label-secondary);
+  }
+
+  .alert-error {
+    @apply rounded-[10px] px-3.5 py-2.5 text-[15px];
+    background-color: rgba(255, 69, 58, 0.15);
+    color: var(--apple-red);
+  }
+
+  .alert-success {
+    @apply rounded-[10px] px-3.5 py-2.5 text-[15px];
+    background-color: rgba(48, 209, 88, 0.15);
+    color: var(--apple-green);
+  }
+
+  .list-row {
+    @apply flex items-center justify-between py-3 text-[17px];
+    border-bottom: 0.5px solid var(--separator);
+  }
+
+  .list-row:last-child {
+    border-bottom: none;
+  }
+
+  .stat-block {
+    @apply rounded-xl px-4 py-3.5;
+    background-color: var(--grouped-secondary);
+  }
+
+  .stat-label {
+    @apply text-[13px];
+    color: var(--label);
+  }
+
+  .stat-value {
+    @apply mt-1 text-[28px] font-semibold tabular-nums tracking-tight text-white;
+  }
+
+  .spinner {
+    @apply inline-block size-4 animate-spin rounded-full border-2 border-white/25 border-t-white;
+  }
+
+  .table-head {
+    @apply px-3 py-2 text-[13px] font-normal;
+    color: var(--label);
+  }
+
+  .table-cell {
+    @apply px-3 py-3 text-[15px] tabular-nums;
+  }
+
+  .page-title {
+    @apply text-[28px] sm:text-[34px] font-bold tracking-tight text-white;
+  }
+
+  .page-subtitle {
+    @apply mt-1 text-[17px] max-w-xl;
+    color: var(--label);
+  }
+
+  .link {
+    color: var(--apple-blue);
+  }
+
+  .link:hover {
+    opacity: 0.8;
+  }
+
+  .separator {
+    border-color: var(--separator);
   }
 }

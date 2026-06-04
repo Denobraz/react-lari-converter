@@ -8,6 +8,19 @@ import {
 } from '../helpers/paymentPeriod.js';
 import {useEffect, useMemo, useState} from 'react';
 
+function CopyButton({value, label, copied, onCopy}) {
+    return (
+        <button
+            type='button'
+            onClick={() => onCopy(value)}
+            className='btn-text mt-2 text-[15px]'
+            aria-label={copied ? `${label}: скопировано` : `${label}: скопировать ${value}`}
+        >
+            {copied ? '✅ Скопировано' : '📋 Копировать'}
+        </button>
+    );
+}
+
 export default function ReportSidebar({
     payments,
     reportYear,
@@ -22,14 +35,14 @@ export default function ReportSidebar({
 
     useEffect(() => {
         if (monthCopied) {
-            const timer = setTimeout(() => setMonthCopied(false), 1000);
+            const timer = setTimeout(() => setMonthCopied(false), 2000);
             return () => clearTimeout(timer);
         }
     }, [monthCopied]);
 
     useEffect(() => {
         if (cumulativeCopied) {
-            const timer = setTimeout(() => setCumulativeCopied(false), 1000);
+            const timer = setTimeout(() => setCumulativeCopied(false), 2000);
             return () => clearTimeout(timer);
         }
     }, [cumulativeCopied]);
@@ -59,20 +72,29 @@ export default function ReportSidebar({
     const adjustmentInputValue = yearAdjustment === 0 ? '' : String(yearAdjustment);
 
     const copyToClipboard = (text, setCopied) => {
-        navigator.clipboard.writeText(text).then(() => setCopied(true));
+        navigator.clipboard.writeText(text).then(() => setCopied(true)).catch(() => {});
     };
 
-    return (
-        <aside className='lg:w-72 shrink-0 space-y-4 rounded-lg bg-neutral-900 p-4 lg:sticky lg:top-5 lg:self-start'>
-            <h2 className='font-medium text-sm uppercase tracking-wide text-neutral-400'>
-                Отчётный период
-            </h2>
+    const countLabel = filteredCount === 1 ? 'платёж'
+        : filteredCount < 5 ? 'платежа' : 'платежей';
 
-            <div className='space-y-3'>
-                <label className='flex flex-col gap-1 text-sm'>
-                    <span className='text-neutral-400'>Год</span>
+    return (
+        <aside
+            className='lg:w-72 shrink-0 card lg:sticky lg:top-6 lg:self-start space-y-5'
+            aria-label='Отчётный период и итоги'
+        >
+            <div>
+                <h2 className='section-title'>📊 Период</h2>
+                <p className='section-desc mt-1'>
+                    {reportMonthLabel} {reportYear} · {filteredCount} {countLabel}
+                </p>
+            </div>
+
+            <div className='grid grid-cols-2 gap-3'>
+                <label className='flex flex-col gap-1.5'>
+                    <span className='field-label'>Год</span>
                     <select
-                        className='bg-neutral-800 px-3 py-2 rounded outline-none w-full'
+                        className='input-field text-[15px]'
                         value={reportYear}
                         onChange={e => onReportYearChange(e.target.value)}
                     >
@@ -81,10 +103,10 @@ export default function ReportSidebar({
                         ))}
                     </select>
                 </label>
-                <label className='flex flex-col gap-1 text-sm'>
-                    <span className='text-neutral-400'>Месяц</span>
+                <label className='flex flex-col gap-1.5'>
+                    <span className='field-label'>Месяц</span>
                     <select
-                        className='bg-neutral-800 px-3 py-2 rounded outline-none w-full'
+                        className='input-field text-[15px]'
                         value={reportMonth}
                         onChange={e => onReportMonthChange(e.target.value)}
                     >
@@ -95,64 +117,59 @@ export default function ReportSidebar({
                 </label>
             </div>
 
-            <p className='text-sm text-neutral-400 border-t border-neutral-800 pt-3'>
-                {reportMonthLabel} {reportYear} · {filteredCount} платежей
-            </p>
-
-            <div className='space-y-3 border-t border-neutral-800 pt-3'>
-                <div>
-                    <p className='text-xs text-neutral-400 mb-1'>Итого за месяц</p>
-                    <p className='font-medium text-lg'>
-                        <span
-                            title='Скопировать'
-                            onClick={() => copyToClipboard(monthTotalInGel, setMonthCopied)}
-                            className='text-blue-400 hover:underline cursor-pointer'
-                        >
-                            {formatAmount(monthTotalInGel)}
-                        </span>
-                        <span className='text-neutral-400 text-sm font-normal ml-1'>₾</span>
+            <div className='space-y-3 separator border-t pt-4'>
+                <div className='stat-block'>
+                    <p className='stat-label'>💰 Итого за месяц</p>
+                    <p className='stat-value'>
+                        {formatAmount(monthTotalInGel)}
+                        <span className='text-[17px] font-normal ml-1' style={{ color: 'var(--label)' }}>₾</span>
                     </p>
-                    {monthCopied && <p className='text-blue-400 text-xs mt-1'>Скопировано</p>}
+                    <CopyButton
+                        value={monthTotalInGel}
+                        label='Итого за месяц'
+                        copied={monthCopied}
+                        onCopy={(v) => copyToClipboard(v, setMonthCopied)}
+                    />
                 </div>
 
-                <div>
-                    <p className='text-xs text-neutral-400 mb-1'>
-                        Нарастающий итог · янв — {reportMonthLabel.toLowerCase()}
+                <div className='stat-block'>
+                    <p className='stat-label'>
+                        📈 Нарастающий итог · янв — {reportMonthLabel.toLowerCase()}
                     </p>
-                    <p className='font-medium text-lg'>
-                        <span
-                            title='Скопировать'
-                            onClick={() => copyToClipboard(cumulativeTotalInGel, setCumulativeCopied)}
-                            className='text-blue-400 hover:underline cursor-pointer'
-                        >
-                            {formatAmount(cumulativeTotalInGel)}
-                        </span>
-                        <span className='text-neutral-400 text-sm font-normal ml-1'>₾</span>
+                    <p className='stat-value'>
+                        {formatAmount(cumulativeTotalInGel)}
+                        <span className='text-[17px] font-normal ml-1' style={{ color: 'var(--label)' }}>₾</span>
                     </p>
-                    {cumulativeCopied && <p className='text-blue-400 text-xs mt-1'>Скопировано</p>}
+                    <CopyButton
+                        value={cumulativeTotalInGel}
+                        label='Нарастающий итог'
+                        copied={cumulativeCopied}
+                        onCopy={(v) => copyToClipboard(v, setCumulativeCopied)}
+                    />
                 </div>
             </div>
 
-            <label className='flex flex-col gap-1 text-sm border-t border-neutral-800 pt-3'>
-                <span className='text-neutral-400'>
-                    Корректировка за {reportYear}
+            <label className='flex flex-col gap-1.5 separator border-t pt-4'>
+                <span className='field-label'>
+                    ✏️ Корректировка · {reportYear}
                 </span>
-                <span className='text-xs text-neutral-500'>
-                    Сумма в лари за месяцы до начала учёта
+                <span className='field-hint'>
+                    Лари за месяцы до начала учёта
                 </span>
                 <input
                     type='number'
+                    inputMode='decimal'
                     step='0.01'
                     min='0'
                     placeholder='0.00'
-                    className='bg-neutral-800 px-3 py-2 rounded outline-none w-full'
+                    className='input-field text-[15px]'
                     value={adjustmentInputValue}
                     onChange={e => onYearAdjustmentChange(e.target.value)}
                 />
             </label>
 
             {(Number(yearAdjustment) || 0) > 0 && (
-                <p className='text-xs text-neutral-500'>
+                <p className='field-hint'>
                     {formatAmount(yearAdjustment)} корр. + {formatAmount(yearPaymentsTotal)} платежи
                 </p>
             )}

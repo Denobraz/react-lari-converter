@@ -1,4 +1,4 @@
-import {CURRENCIES} from '../data/currencies.data.js';
+import {CURRENCIES, CURRENCY_EMOJI} from '../data/currencies.data.js';
 import {MONTHS} from '../data/months.data.js';
 import {formatAmount} from '../helpers/formatAmount.js';
 import {isPaymentInMonth} from '../helpers/paymentPeriod.js';
@@ -8,17 +8,17 @@ export default function PaymentsTable({payments, reportYear, reportMonth, onDele
 
     const formatCurrency = (code) => {
         const currency = CURRENCIES.find(c => c.code === code);
-        return currency ? currency.name : 'Неизвестная валюта';
-    }
+        return currency ? currency.name : code;
+    };
 
     const formatDate = (date) => {
         const d = new Date(date);
         return d.toLocaleDateString('ru-RU', {
             year: 'numeric',
             month: '2-digit',
-            day: '2-digit'
+            day: '2-digit',
         });
-    }
+    };
 
     const reportMonthLabel = MONTHS.find(m => m.value === reportMonth)?.label ?? '';
 
@@ -26,47 +26,77 @@ export default function PaymentsTable({payments, reportYear, reportMonth, onDele
         return payments.filter(p => isPaymentInMonth(p, reportYear, reportMonth));
     }, [payments, reportYear, reportMonth]);
 
-    return (
-        <section className='space-y-3 min-w-0'>
-            <h2 className='font-medium'>Список платежей</h2>
+    const handleDelete = (payment) => {
+        const confirmed = window.confirm(
+            `Удалить платёж ${formatAmount(payment.amount)} ${payment.currency} от ${formatDate(payment.date)}?`
+        );
+        if (confirmed) {
+            onDelete(payment.id);
+        }
+    };
 
-            <div className='overflow-x-auto rounded-lg'>
-                <table className='table-auto lg:table-fixed w-full text-left border-collapse'>
-                    <thead>
-                    <tr className='bg-neutral-800'>
-                        <th className='px-3 py-2 font-medium whitespace-nowrap'>#</th>
-                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Сумма</th>
-                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Валюта</th>
-                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Дата</th>
-                        <th className='px-3 py-2 font-medium whitespace-nowrap'>Сумма в лари</th>
-                        <th className='px-3 py-2 font-medium whitespace-nowrap'></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {filteredPayments.map((p, i) => (
-                        <tr key={p.id} className='odd:bg-neutral-900 even:bg-neutral-800'>
-                            <td className='px-3 py-1 whitespace-nowrap'>{i + 1}</td>
-                            <td className='px-3 py-1 whitespace-nowrap'>{formatAmount(p.amount)}</td>
-                            <td className='px-3 py-1 whitespace-nowrap'>{formatCurrency(p.currency)}</td>
-                            <td className='px-3 py-1 whitespace-nowrap'>{formatDate(p.date)}</td>
-                            <td className='px-3 py-1 whitespace-nowrap'>{formatAmount(p.amountInGel)}</td>
-                            <td className='px-3 py-1 whitespace-nowrap'>
-                                <button onClick={() => onDelete(p.id)}
-                                        className='text-red-400 hover:text-red-300 cursor-pointer'>Удалить
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    {!filteredPayments.length && (
-                        <tr>
-                            <td colSpan={6} className='px-3 py-3 text-center text-neutral-400'>
-                                Нет платежей за {reportMonthLabel.toLowerCase()} {reportYear}
-                            </td>
-                        </tr>
+    const countLabel = filteredPayments.length === 1 ? 'запись'
+        : filteredPayments.length < 5 ? 'записи' : 'записей';
+
+    return (
+        <section className='card space-y-4 min-w-0' aria-labelledby='payments-heading'>
+            <div>
+                <h2 id='payments-heading' className='section-title'>📋 Платежи</h2>
+                <p className='section-desc mt-1'>
+                    {reportMonthLabel} {reportYear}
+                    {filteredPayments.length > 0 && (
+                        <> · {filteredPayments.length} {countLabel}</>
                     )}
-                    </tbody>
-                </table>
+                </p>
             </div>
+
+            {filteredPayments.length === 0 ? (
+                <p className='py-10 text-center text-[15px]' style={{ color: 'var(--label)' }}>
+                    📭 Нет платежей за выбранный период
+                </p>
+            ) : (
+                <div className='overflow-x-auto -mx-5 px-5'>
+                    <table className='w-full min-w-[480px] text-left border-collapse'>
+                        <thead>
+                        <tr className='separator border-b'>
+                            <th scope='col' className='table-head w-8'>№</th>
+                            <th scope='col' className='table-head'>Сумма</th>
+                            <th scope='col' className='table-head'>Валюта</th>
+                            <th scope='col' className='table-head'>Дата</th>
+                            <th scope='col' className='table-head text-right'>₾</th>
+                            <th scope='col' className='table-head w-16'>
+                                <span className='sr-only'>Действия</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {filteredPayments.map((p, i) => (
+                            <tr key={p.id} className='separator border-b last:border-0'>
+                                <td className='table-cell text-[13px]' style={{ color: 'var(--label)' }}>{i + 1}</td>
+                                <td className='table-cell font-medium'>{formatAmount(p.amount)}</td>
+                                <td className='table-cell'>
+                                    {CURRENCY_EMOJI[p.currency]}{' '}
+                                    <span style={{ color: 'var(--label)' }}>{p.currency}</span>
+                                    <span className='sr-only'>{formatCurrency(p.currency)}</span>
+                                </td>
+                                <td className='table-cell' style={{ color: 'var(--label)' }}>{formatDate(p.date)}</td>
+                                <td className='table-cell font-semibold text-right'>{formatAmount(p.amountInGel)}</td>
+                                <td className='table-cell text-right'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleDelete(p)}
+                                        className='btn-destructive'
+                                        aria-label={`Удалить платёж ${formatAmount(p.amount)} ${p.currency}`}
+                                    >
+                                        🗑️
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </section>
     );
 }

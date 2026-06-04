@@ -1,5 +1,15 @@
 export function Footer() {
-    return <footer className='text-sm text-neutral-400 lg:text-base text-center md:absolute bottom-0 left-0 w-full mt-4 md:py-6'>
-        Сделал с ❤️ <a className='underline hover:text-blue-400' target='_blank' href='https://github.com/Denobraz'>Denobraz</a>
-    </footer>
+    return (
+        <footer className='mt-auto pt-8 pb-2 text-center text-[13px]' style={{ color: 'var(--label-secondary)' }}>
+            Сделано с ❤️{' '}
+            <a
+                className='link text-[13px]'
+                target='_blank'
+                rel='noopener noreferrer'
+                href='https://github.com/Denobraz'
+            >
+                Denobraz
+            </a>
+        </footer>
+    );
 }

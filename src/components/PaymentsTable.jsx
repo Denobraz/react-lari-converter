@@ -1,25 +1,10 @@
 import {CURRENCIES} from '../data/currencies.data.js';
-import {useEffect, useMemo, useState} from "react";
+import {MONTHS} from '../data/months.data.js';
+import {formatAmount} from '../helpers/formatAmount.js';
+import {isPaymentInMonth} from '../helpers/paymentPeriod.js';
+import {useMemo} from 'react';
 
-export default function PaymentsTable({payments, onDelete}) {
-
-    const [totalInGelCopied, setTotalInGelCopied] = useState(false);
-
-    useEffect(() => {
-
-        if (totalInGelCopied) {
-            const timer = setTimeout(() => setTotalInGelCopied(false), 1000);
-            return () => clearTimeout(timer);
-        }
-
-    }, [totalInGelCopied])
-
-    const formatAmount = (amount) => {
-        return new Intl.NumberFormat('ru-RU', {
-            style: 'decimal',
-            maximumFractionDigits: 2
-        }).format(amount).replace(',', '.');
-    }
+export default function PaymentsTable({payments, reportYear, reportMonth, onDelete}) {
 
     const formatCurrency = (code) => {
         const currency = CURRENCIES.find(c => c.code === code);
@@ -35,18 +20,16 @@ export default function PaymentsTable({payments, onDelete}) {
         });
     }
 
-    const totalInGel = useMemo(() => {
-        return payments.reduce((sum, p) => sum + p.amountInGel, 0).toFixed(2);
-    }, [payments]);
+    const reportMonthLabel = MONTHS.find(m => m.value === reportMonth)?.label ?? '';
 
-    const copyTotalInGel = () => {
-        navigator.clipboard.writeText(totalInGel)
-            .then(() => setTotalInGelCopied(true));
-    }
+    const filteredPayments = useMemo(() => {
+        return payments.filter(p => isPaymentInMonth(p, reportYear, reportMonth));
+    }, [payments, reportYear, reportMonth]);
 
     return (
-        <section className='space-y-3'>
-            <h2 className='font-medium'>Список платежей ({payments.length})</h2>
+        <section className='space-y-3 min-w-0'>
+            <h2 className='font-medium'>Список платежей</h2>
+
             <div className='overflow-x-auto rounded-lg'>
                 <table className='table-auto lg:table-fixed w-full text-left border-collapse'>
                     <thead>
@@ -60,35 +43,30 @@ export default function PaymentsTable({payments, onDelete}) {
                     </tr>
                     </thead>
                     <tbody>
-                    {payments.map((p, i) => (
-                        <tr key={i} className='odd:bg-neutral-900 even:bg-neutral-800'>
+                    {filteredPayments.map((p, i) => (
+                        <tr key={p.id} className='odd:bg-neutral-900 even:bg-neutral-800'>
                             <td className='px-3 py-1 whitespace-nowrap'>{i + 1}</td>
                             <td className='px-3 py-1 whitespace-nowrap'>{formatAmount(p.amount)}</td>
                             <td className='px-3 py-1 whitespace-nowrap'>{formatCurrency(p.currency)}</td>
                             <td className='px-3 py-1 whitespace-nowrap'>{formatDate(p.date)}</td>
                             <td className='px-3 py-1 whitespace-nowrap'>{formatAmount(p.amountInGel)}</td>
                             <td className='px-3 py-1 whitespace-nowrap'>
-                                <button onClick={() => onDelete(i)}
+                                <button onClick={() => onDelete(p.id)}
                                         className='text-red-400 hover:text-red-300 cursor-pointer'>Удалить
                                 </button>
                             </td>
                         </tr>
                     ))}
-                    {!payments.length && (
+                    {!filteredPayments.length && (
                         <tr>
-                            <td colSpan={6} className='px-3 py-3 text-center text-neutral-400'>Нет данных</td>
+                            <td colSpan={6} className='px-3 py-3 text-center text-neutral-400'>
+                                Нет платежей за {reportMonthLabel.toLowerCase()} {reportYear}
+                            </td>
                         </tr>
                     )}
                     </tbody>
                 </table>
             </div>
-            <div className='mt-3'>
-                <div className='font-medium'>
-                    💸 Итого в лари: <span title='Скопировать' onClick={copyTotalInGel} className='text-blue-400 hover:underline cursor-pointer'>{formatAmount(totalInGel)}</span>
-                    {totalInGelCopied && <span className='text-blue-400 text-sm ml-2'>(скопировано)</span>}
-                </div>
-            </div>
         </section>
     );
 }
-
